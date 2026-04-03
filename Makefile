@@ -10,7 +10,7 @@ CFLAGS := -Wall -Werror -std=c99 -g -O2 \
           $(MONOCYPHER_CFLAGS) $(BRAID_CFLAGS)
 LDFLAGS := $(MONOCYPHER_LDFLAGS) $(BRAID_LDFLAGS)
 
-.PHONY: all clean install test
+.PHONY: all clean install test valgrind
 
 all: cherf2
 
@@ -25,6 +25,10 @@ tests/test_cherf2: tests/test_cherf2.c helpers.o
 
 test: tests/test_cherf2
 	./tests/test_cherf2
+
+valgrind: tests/test_cherf2
+	valgrind --leak-check=full --errors-for-leak-kinds=definite,possible \
+		--error-exitcode=1 ./tests/test_cherf2
 
 clean:
 	rm -f $(OBJS) cherf2 tests/test_cherf2

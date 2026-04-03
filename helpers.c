@@ -61,7 +61,7 @@ int read_key(uint8_t key[static 32], const char *fn) {
   return -1;
 
 success:
-  if (fread(key, 1, 32, f) != 32) return -1;
+  if (fread(key, 1, 32, f) != 32) { fclose(f); return -1; }
   return fclose(f);
 }
 
