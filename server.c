@@ -129,8 +129,10 @@ static void handle(int fd) {
 
       if (chsend(b, a->ch, (usize)&(ConnectData){ sa.sin_addr.s_addr, sa.sin_port })) {
         syslog(LOG_ERR, "[%-15s] chsend failed while handling ATTACH: %m", ip);
+        free(a);
         goto done;
       } else chclose(b, a->ch);
+      free(a);
     }
   } else {
     struct timespec ts;
@@ -191,6 +193,13 @@ static void handle(int fd) {
 
     keepc = braidadd(b, keepalive, 65536, "keepalive", CORD_NORMAL, 2, fd, c);
     cd = (ConnectData *)chrecv(b, c, 0);
+
+    if (!cd) {
+      struct ad **pp = &t->head;
+      while (*pp && *pp != a) pp = &(*pp)->next;
+      if (*pp) *pp = a->next;
+    }
+    free(a);
 
     if (--t->n == 0) {
       HASH_DEL(map, t);
