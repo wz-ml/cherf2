@@ -1,4 +1,4 @@
-#ifndef __APPLE__
+#if !defined(__APPLE__) && !defined(__FreeBSD__)
 #define _GNU_SOURCE
 #define _POSIX_C_SOURCE 200809L
 #endif
@@ -155,7 +155,7 @@ void splice(braid_t b, char daemon, int from, int to, ch_t ch) {
   while ((n = fdread(b, from, buf, sizeof(buf)))) {
     ssize_t tot = 0;
     if (n <= 0) break;
-    if (n == 0) { errno = ENODATA; break; }
+    if (n == 0) { errno = ECONNRESET; break; }
     while (tot < n) {
       int rc = fdwrite(b, to, buf + tot, n - tot);
       if (rc < 0) break;
